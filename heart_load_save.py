@@ -26,14 +26,17 @@ rf = RandomForestClassifier(
 rf.fit(x_train, y_train)
 
 # Save the model
-joblib.dump(rf, "heart_model_rf.pkl")
+joblib.dump(rf, "heart_model_pipeline.pkl")
 print("Model saved")
 
 # Load the model back
-loaded_model = joblib.load("heart_model_rf.pkl")
+loaded_model = joblib.load("heart_model_pipeline.pkl")
 print("Model loaded successfully")
 
 # Make prediction with the loaded model
 y_pred = loaded_model.predict(x_test)
 accuracy = accuracy_score(y_test, y_pred)
 print(f"Accuracy from loaded model: {accuracy:.4f}")
+
+joblib.dump(list(x_train.columns), 'heart_columns.pkl')
+
