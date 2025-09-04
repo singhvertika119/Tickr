@@ -3,6 +3,8 @@ import joblib
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+import sys
+import json
 
 # Load and preprocess data
 df = pd.read_csv("heart-disease.csv")
@@ -27,16 +29,22 @@ rf.fit(x_train, y_train)
 
 # Save the model
 joblib.dump(rf, "heart_model_pipeline.pkl")
-print("Model saved")
 
 # Load the model back
 loaded_model = joblib.load("heart_model_pipeline.pkl")
-print("Model loaded successfully")
+
+# read output
+data = json.loads(sys.argv[1])
+features = data["features"]
 
 # Make prediction with the loaded model
 y_pred = loaded_model.predict(x_test)
 accuracy = accuracy_score(y_test, y_pred)
-print(f"Accuracy from loaded model: {accuracy:.4f}")
 
 joblib.dump(list(x_train.columns), 'heart_columns.pkl')
+
+# make prediction 
+prediction = loaded_model.predict([features]).tolist()
+
+print(json.dumps({"prediction": int(prediction[0])}))
 

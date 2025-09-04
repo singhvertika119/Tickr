@@ -1,0 +1,17 @@
+{
+  "name": "heart-disease-prediction",
+  "version": "1.0.0",
+  "description": "A machine learning project that predicts whether a person is at risk of heart disease based on key health parameters. Built using Scikit-learn, Streamlit, and XGBoost with interpretability and deployment in mind.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  }
+}
