@@ -1,16 +1,7 @@
-# heart_app.py
-
 import streamlit as st
-import pandas as pd
-import joblib
+import requests
 
-# Load model and column order
-model = joblib.load("heart_model_pipeline.pkl")
-columns = joblib.load("heart_columns.pkl")
-
-# UI Title
-st.title("💓 Heart Disease Prediction App")
-st.write("Enter the patient's details to predict the risk of heart disease.")
+st.title("💓 Heart Disease Prediction App (via FastAPI)")
 
 # Sidebar Inputs
 age = st.sidebar.slider("Age", 20, 100, 50)
@@ -27,38 +18,34 @@ slope = st.sidebar.selectbox("Slope of ST Segment", [0, 1, 2])
 ca = st.sidebar.selectbox("Number of Major Vessels (0-3)", [0, 1, 2, 3])
 thal = st.sidebar.selectbox("Thalassemia", [0, 1, 2, 3])
 
-# Manual input dict
-input_data = {
-    'age': age,
-    'sex': 1 if sex == 'Male' else 0,
-    'cp': cp,
-    'trestbps': trestbps,
-    'chol': chol,
-    'fbs': fbs,
-    'restecg': restecg,
-    'thalach': thalach,
-    'exang': exang,
-    'oldpeak': oldpeak,
-    'slope': slope,
-    'ca': ca,
-    'thal': thal
-}
+API_URL = "http://127.0.0.1:8000/predict/"
 
-# Fill any missing columns (if one-hot encoded)
-for col in columns:
-    if col not in input_data:
-        input_data[col] = 0
-
-# Convert to DataFrame and reorder
-input_df = pd.DataFrame([input_data])[columns]
-
-# Predict
 if st.button("🔍 Predict Heart Disease"):
-    prediction = model.predict(input_df)[0]
-    probability = model.predict_proba(input_df)[0][1]
+    payload = {
+        "age": age,
+        "sex": sex,
+        "cp": cp,
+        "trestbps": trestbps,
+        "chol": chol,
+        "fbs": fbs,
+        "restecg": restecg,
+        "thalach": thalach,
+        "exang": exang,
+        "oldpeak": oldpeak,
+        "slope": slope,
+        "ca": ca,
+        "thal": thal
+    }
 
-    st.subheader("🩺 Prediction Result:")
-    st.success("High Risk of Heart Disease 💔" if prediction == 1 else "Low Risk ✅")
-
-    st.subheader("📊 Risk Probability:")
-    st.info(f"{round(probability * 100, 2)} %")
+    try:
+        response = requests.post(API_URL, json=payload)
+        if response.status_code == 200:
+            data = response.json()
+            st.subheader("🩺 Prediction Result:")
+            st.success(data["risk"])
+            st.subheader("📊 Risk Probability:")
+            st.info(f"{data['risk_probability']} %")
+        else:
+            st.error(f"API Error: {response.text}")
+    except Exception as e:
+        st.error(f"Failed to connect to API: {e}")
